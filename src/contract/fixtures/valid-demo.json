@@ -1,0 +1,65 @@
+{
+  "contract": "mat-console.status/1",
+  "generated_at": "2026-09-25T14:20:00Z",
+  "ttl_seconds": 3600,
+  "project": {
+    "id": "relay",
+    "name": "Relay",
+    "summary": "Durable workflow runtime prototype."
+  },
+  "source": {
+    "label": "mock adapter",
+    "evidence_url": "https://example.com/relay/status"
+  },
+  "health": {
+    "state": "attention",
+    "summary": "Two blocked items and one failed run need review."
+  },
+  "progress": {
+    "percent": 62,
+    "basis": "reporter-estimated, not derived from task counts"
+  },
+  "milestones": [
+    {
+      "id": "m1",
+      "title": "Runtime Core",
+      "state": "done",
+      "evidence_url": "https://example.com/relay/m1"
+    },
+    {
+      "id": "m3",
+      "title": "Durable Execution",
+      "state": "current",
+      "description": "Read-only checks for unknown results.",
+      "evidence_count": { "recorded": 6, "expected": 9 }
+    },
+    {
+      "id": "m4",
+      "title": "Artifact Lineage",
+      "state": "planned"
+    }
+  ],
+  "runs": [
+    {
+      "id": "run-140",
+      "label": "#140",
+      "status": "failed",
+      "started_at": "2026-09-25T11:00:00Z",
+      "finished_at": "2026-09-25T11:12:00Z",
+      "evidence_url": "https://example.com/relay/runs/140"
+    }
+  ],
+  "attention": [
+    {
+      "id": "a1",
+      "title": "Timeout boundary unverified",
+      "severity": "blocked",
+      "evidence_url": "https://example.com/relay/attention/a1"
+    },
+    {
+      "id": "a2",
+      "title": "Link policy needs second reviewer",
+      "severity": "warn"
+    }
+  ]
+}

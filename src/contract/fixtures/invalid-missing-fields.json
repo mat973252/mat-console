@@ -1,0 +1,11 @@
+{
+  "contract": "mat-console.status/0",
+  "project": {
+    "name": ""
+  },
+  "health": { "state": "on-fire" },
+  "milestones": [{ "title": "missing id and state" }],
+  "runs": [{ "status": "exploded" }],
+  "attention": [{ "id": "a1" }],
+  "progress": { "percent": 140 }
+}
