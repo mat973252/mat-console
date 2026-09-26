@@ -2,7 +2,7 @@
 import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import quote, urlsplit
+from urllib.parse import urlsplit
 
 FILES = {"agent-platform.json": "Agent Platform", "relay.json": "Relay", "agent-permit4j.json": "AgentPermit4j"}
 
@@ -19,17 +19,7 @@ def main():
         def do_GET(self):
             path = urlsplit(self.path).path
             if path == "/":
-                rows = []
-                for filename, name in FILES.items():
-                    if (root / filename).is_file():
-                        url = origin + "/?url=" + quote(f"http://127.0.0.1:{args.port}/{filename}", safe="")
-                        rows.append(f'<li><a href="{url}">{name}</a></li>')
-                    else:
-                        rows.append(f"<li>{name} — 尚未导出</li>")
-                body = ('<!doctype html><meta charset="utf-8"><title>Workbench</title>'
-                        '<style>body{background:#FBF9F8;color:#142121;font:18px system-ui;max-width:760px;margin:60px auto;padding:24px}a{color:#276759}li{margin:24px 0}</style>'
-                        '<h1>项目状态入口</h1><p>只读快照。查看来源、采样时间和过期提示；重新导出后刷新页面。</p><ul>'
-                        + "".join(rows) + "</ul>").encode()
+                body = Path(__file__).with_name("workbench.html").read_bytes()
                 content_type = "text/html; charset=utf-8"
             elif path[1:] in FILES:
                 try:
