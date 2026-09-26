@@ -15,11 +15,11 @@ export function SourceBadges({
     <div className="flex items-center gap-2 text-xs">
       {freshness === "stale" && (
         <span className="rounded-full bg-warn-wash px-2.5 py-1 font-medium text-warn">
-          stale data
+          快照已过期
         </span>
       )}
       <span className="rounded-full bg-mint-wash px-2.5 py-1 font-medium text-mint-ink">
-        {adapter.isDemo ? `demo data · ${adapter.label}` : adapter.label}
+        {adapter.isDemo ? `演示数据 · ${adapter.label}` : adapter.label}
       </span>
     </div>
   );
@@ -38,17 +38,17 @@ export function TopBar({
     <header className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-10">
       <div className="flex items-baseline gap-3">
         <span className="font-display text-lg font-bold tracking-tight">mat.console</span>
-        <span className="text-sm text-ink-soft">Project journal</span>
+        <span className="text-sm text-ink-soft">项目进程</span>
       </div>
       <div className="flex items-center gap-6">
         <nav aria-label="breadcrumb" className="hidden text-sm text-ink-soft sm:block">
           <ol className="flex items-center gap-2">
-            <li>Projects</li>
+            <li>项目</li>
             <li aria-hidden="true">/</li>
             <li>{projectName ?? "…"}</li>
             <li aria-hidden="true">/</li>
             <li aria-current="page" className="text-ink">
-              Overview
+              概览
             </li>
           </ol>
         </nav>
@@ -59,10 +59,10 @@ export function TopBar({
 }
 
 const STATE_LABEL: Record<string, string> = {
-  done: "done",
-  current: "current",
-  planned: "planned",
-  blocked: "blocked",
+  done: "已完成",
+  current: "进行中",
+  planned: "计划中",
+  blocked: "已阻塞",
 };
 
 function Timeline({ view }: { view: OverviewView }) {
@@ -70,7 +70,7 @@ function Timeline({ view }: { view: OverviewView }) {
   return (
     <section aria-labelledby="timeline-heading">
       <h2 id="timeline-heading" className="font-display text-2xl font-semibold">
-        Milestones
+        里程碑
       </h2>
       <ol className="mt-6 space-y-7 border-l border-line pl-6">
         {view.milestones.map((m) => {
@@ -111,7 +111,7 @@ function Timeline({ view }: { view: OverviewView }) {
                   rel="noreferrer"
                   className="mt-1.5 inline-block text-sm font-medium text-mint-ink underline decoration-mint underline-offset-4 hover:decoration-mint-ink"
                 >
-                  View evidence ↗
+                  查看证据 ↗
                 </a>
               )}
             </li>
@@ -132,10 +132,10 @@ function SnapshotRow({ label, children }: { label: string; children: React.React
 }
 
 const HEALTH_LABEL: Record<string, string> = {
-  ok: "reported healthy",
-  attention: "needs attention",
-  degraded: "reported degraded",
-  unknown: "not reported",
+  ok: "报告正常",
+  attention: "需要关注",
+  degraded: "报告降级",
+  unknown: "尚未报告",
 };
 
 function Snapshot({ view }: { view: OverviewView }) {
@@ -143,14 +143,14 @@ function Snapshot({ view }: { view: OverviewView }) {
     <aside aria-labelledby="snapshot-heading">
       <div className="border-t-4 border-ink pt-4">
         <h2 id="snapshot-heading" className="text-sm font-semibold tracking-wide">
-          Current snapshot
+          当前快照
         </h2>
         <dl className="mt-3">
-          <SnapshotRow label="Reported health">
+          <SnapshotRow label="报告状态">
             {view.freshness === "stale" ? (
-              // A stale report is an old claim — never styled as live health.
+              // A 过期报告 is an old claim — never styled as live health.
               <span className="text-warn">
-                {HEALTH_LABEL[view.healthState]} · stale report
+                {HEALTH_LABEL[view.healthState]} · 过期报告
               </span>
             ) : (
               <span
@@ -166,17 +166,17 @@ function Snapshot({ view }: { view: OverviewView }) {
               </span>
             )}
           </SnapshotRow>
-          <SnapshotRow label="Current milestone">
+          <SnapshotRow label="当前里程碑">
             {view.currentMilestone
               ? `${view.phaseIndex} · ${view.currentMilestone.title}`
-              : "none in progress"}
+              : "暂无进行中里程碑"}
           </SnapshotRow>
-          <SnapshotRow label="Acceptance records">
+          <SnapshotRow label="验收记录">
             {view.evidenceRecorded !== undefined && view.evidenceExpected !== undefined
               ? `${view.evidenceRecorded} / ${view.evidenceExpected}`
-              : "not reported"}
+              : "尚未报告"}
           </SnapshotRow>
-          <SnapshotRow label="Recent failed run">
+          <SnapshotRow label="最近失败运行">
             {view.lastFailedRun ? (
               view.lastFailedRun.evidence_url ? (
                 <a
@@ -191,10 +191,10 @@ function Snapshot({ view }: { view: OverviewView }) {
                 <span className="text-danger">{view.lastFailedRun.label ?? view.lastFailedRun.id}</span>
               )
             ) : (
-              "none reported"
+              "暂无记录"
             )}
           </SnapshotRow>
-          <SnapshotRow label="Blocked items">
+          <SnapshotRow label="阻塞项">
             {view.blockedCount > 0 ? (
               <span className="text-danger">{view.blockedCount}</span>
             ) : (
@@ -206,7 +206,7 @@ function Snapshot({ view }: { view: OverviewView }) {
 
       <div className="mt-6 rounded-lg bg-mint-wash p-5" aria-labelledby="inspect-heading">
         <h2 id="inspect-heading" className="font-display text-lg font-semibold">
-          What to inspect next
+          下一步查看
         </h2>
         <p className="mt-1.5 text-sm text-ink-soft">
           {view.nextInspection ? (
@@ -223,7 +223,7 @@ function Snapshot({ view }: { view: OverviewView }) {
               view.nextInspection.text
             )
           ) : (
-            "Nothing needs review — no evidence link was provided."
+            "暂无可供查看的证据链接。"
           )}
         </p>
       </div>
@@ -236,7 +236,7 @@ export function AttentionList({ view }: { view: OverviewView }) {
   return (
     <section aria-labelledby="attention-heading" className="mt-10">
       <h2 id="attention-heading" className="font-display text-2xl font-semibold">
-        Needs attention
+        需要关注
       </h2>
       <ul className="mt-4 divide-y divide-line border-y border-line">
         {view.attention.map((a) => (
@@ -252,7 +252,7 @@ export function AttentionList({ view }: { view: OverviewView }) {
                         : "bg-line text-ink-soft"
                   }`}
                 >
-                  {a.severity}
+                  {{ info: "提示", warn: "注意", blocked: "阻塞" }[a.severity]}
                 </span>
                 {a.title}
               </p>
@@ -265,7 +265,7 @@ export function AttentionList({ view }: { view: OverviewView }) {
                 rel="noreferrer"
                 className="shrink-0 text-sm font-medium text-mint-ink underline decoration-mint underline-offset-4"
               >
-                Evidence ↗
+                查看证据 ↗
               </a>
             )}
           </li>
@@ -280,7 +280,7 @@ export function RunsList({ view }: { view: OverviewView }) {
   return (
     <section aria-labelledby="runs-heading" className="mt-10">
       <h2 id="runs-heading" className="font-display text-2xl font-semibold">
-        Recent runs
+        最近运行
       </h2>
       <ul className="mt-4 divide-y divide-line border-y border-line">
         {view.runs.map((r) => (
@@ -296,7 +296,7 @@ export function RunsList({ view }: { view: OverviewView }) {
                       : "text-ink-soft"
                 }`}
               >
-                {r.status}
+                {{ succeeded: "成功", failed: "失败", running: "运行中", cancelled: "已取消", unknown: "未知" }[r.status]}
               </span>
             </div>
             <div className="flex items-baseline gap-4 text-sm text-ink-soft">
@@ -308,7 +308,7 @@ export function RunsList({ view }: { view: OverviewView }) {
                   rel="noreferrer"
                   className="font-medium text-mint-ink underline decoration-mint underline-offset-4"
                 >
-                  Evidence ↗
+                  查看证据 ↗
                 </a>
               )}
             </div>
@@ -342,7 +342,7 @@ export function JournalBody({
       <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-mint-ink">
         {status.project.name}
         {status.project.id !== status.project.name.toLowerCase() && ` (${status.project.id})`}
-        {" · current state"}
+        {" · 当前状态"}
       </p>
       <h1 className="mt-3 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
         {headline}
@@ -360,7 +360,7 @@ export function JournalBody({
 
       <footer className="mt-12 space-y-1 text-xs text-ink-soft">
         <p>
-          Source: {adapter.label}
+          来源： {adapter.label}
           {adapter.sourceUrl && (
             <>
               {" · "}
@@ -379,7 +379,7 @@ export function JournalBody({
             </>
           )}
           {status.source?.label && status.source.label !== adapter.label
-            ? ` · reported by ${status.source.label}`
+            ? ` · 报告方： ${status.source.label}`
             : null}
           {status.source?.evidence_url && (
             <>
@@ -390,21 +390,21 @@ export function JournalBody({
                 rel="noreferrer"
                 className="text-mint-ink underline underline-offset-2"
               >
-                status evidence
+                状态证据
               </a>
             </>
           )}
         </p>
         <p>
-          Reported at <time dateTime={status.generated_at}>{formatTime(status.generated_at)}</time>
-          {" · fetched "}
+          报告时间： <time dateTime={status.generated_at}>{formatTime(status.generated_at)}</time>
+          {" · 读取于 "}
           <time dateTime={fetchedAt.toISOString()}>{formatTime(fetchedAt.toISOString())}</time>
           {view.freshness === "stale" && (
-            <span className="font-medium text-warn"> · stale (past reported TTL)</span>
+            <span className="font-medium text-warn"> · 已过期（超过报告有效期）</span>
           )}
-          {view.freshness === "unknown" && " · freshness unknown (no TTL reported)"}
+          {view.freshness === "unknown" && " · 时效未知（未报告有效期）"}
         </p>
-        <p>Reported status is evidence, not verification.</p>
+        <p>状态报告是证据，不是验收结论。</p>
       </footer>
     </main>
   );
@@ -422,7 +422,7 @@ function StateShell({
   return (
     <main className="mx-auto w-full max-w-3xl px-5 pb-16 sm:px-10">
       <div className="mt-16 rounded-lg border border-line bg-paper p-8">{children}</div>
-      <p className="mt-4 text-xs text-ink-soft">Source: {adapter.label}</p>
+      <p className="mt-4 text-xs text-ink-soft">来源： {adapter.label}</p>
     </main>
   );
 }
@@ -431,7 +431,7 @@ export function LoadingState({ adapter }: { adapter: StatusAdapter }) {
   return (
     <StateShell adapter={adapter}>
       <p className="text-sm font-medium text-ink-soft" role="status">
-        Loading project status…
+        正在读取项目状态…
       </p>
       <div className="mt-4 space-y-3" aria-hidden="true">
         <div className="h-6 w-2/3 animate-pulse rounded bg-line" />
@@ -451,21 +451,21 @@ export function ErrorState({
 }) {
   return (
     <StateShell adapter={adapter}>
-      <h1 className="font-display text-2xl font-semibold">Status could not be fetched</h1>
+      <h1 className="font-display text-2xl font-semibold">Status could not be 读取于</h1>
       <p className="mt-2 text-sm text-ink-soft">
         The console cannot reach the status source, so this project is <strong>not</strong> shown
         as healthy — its real state is unknown.
       </p>
       <dl className="mt-4 space-y-1 text-sm">
         <div className="flex gap-2">
-          <dt className="text-ink-soft">Error:</dt>
+          <dt className="text-ink-soft">错误：</dt>
           <dd className="font-medium text-danger">
             {error.kind}
             {error.httpStatus ? ` ${error.httpStatus}` : ""}
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="text-ink-soft">Detail:</dt>
+          <dt className="text-ink-soft">详情：</dt>
           <dd>{error.message}</dd>
         </div>
         {adapter.sourceUrl && (
@@ -495,7 +495,7 @@ export function InvalidState({
 }) {
   return (
     <StateShell adapter={adapter}>
-      <h1 className="font-display text-2xl font-semibold">Invalid status document</h1>
+      <h1 className="font-display text-2xl font-semibold">状态文件无效</h1>
       <p className="mt-2 text-sm text-ink-soft">
         The source responded, but the payload does not satisfy{" "}
         <code className="rounded bg-line px-1">mat-console.status/1</code>. It is treated as
@@ -526,10 +526,10 @@ export function EmptyState({
       <h1 className="font-display text-2xl font-semibold">{projectName}</h1>
       <p className="mt-2 text-sm text-ink-soft">
         The status document is valid but reports no milestones, runs, or attention items yet —
-        health is <strong>not reported</strong>.
+        health is <strong>尚未报告</strong>.
       </p>
       <p className="mt-4 text-xs text-ink-soft">
-        Reported at <time dateTime={generatedAt}>{formatTime(generatedAt)}</time>
+        报告时间： <time dateTime={generatedAt}>{formatTime(generatedAt)}</time>
       </p>
     </StateShell>
   );

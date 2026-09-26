@@ -5,6 +5,7 @@ import {
   type ProjectRun,
   type ProjectStatus,
 } from "../contract/status";
+import { chinese } from "./chinese.js";
 
 export interface OverviewView {
   status: ProjectStatus;
@@ -26,6 +27,13 @@ export interface OverviewView {
 }
 
 export function deriveOverview(status: ProjectStatus, now: Date): OverviewView {
+  status = {
+    ...status,
+    project: { ...status.project, summary: status.project.summary ? chinese(status.project.summary) : undefined },
+    health: status.health ? { ...status.health, summary: status.health.summary ? chinese(status.health.summary) : undefined } : undefined,
+    milestones: status.milestones?.map(m => ({ ...m, title: chinese(m.title), description: m.description ? chinese(m.description) : undefined })),
+    attention: status.attention?.map(a => ({ ...a, title: chinese(a.title), detail: a.detail ? chinese(a.detail) : undefined })),
+  };
   const { freshness, ageSeconds } = freshnessOf(status, now);
   const milestones = status.milestones ?? [];
   const runs = status.runs ?? [];
@@ -52,22 +60,22 @@ export function deriveOverview(status: ProjectStatus, now: Date): OverviewView {
   let nextInspection: OverviewView["nextInspection"];
   if (lastFailedRun) {
     nextInspection = {
-      text: `Inspect failed run ${lastFailedRun.label ?? lastFailedRun.id}`,
+      text: `查看失败运行 ${lastFailedRun.label ?? lastFailedRun.id}`,
       url: lastFailedRun.evidence_url,
     };
   } else if (attention.some((a) => a.severity === "blocked")) {
     const blocked = attention.find((a) => a.severity === "blocked")!;
-    nextInspection = { text: `Review blocked item: ${blocked.title}`, url: blocked.evidence_url };
+    nextInspection = { text: `查看阻塞项： ${blocked.title}`, url: blocked.evidence_url };
   } else if (currentMilestone) {
     nextInspection = {
-      text: `Review current milestone: ${currentMilestone.title}`,
+      text: `查看当前里程碑： ${currentMilestone.title}`,
       url: currentMilestone.evidence_url,
     };
   } else if (attention.some((a) => a.evidence_url)) {
     const item = attention.find((a) => a.evidence_url)!;
-    nextInspection = { text: `Review item: ${item.title}`, url: item.evidence_url };
+    nextInspection = { text: `查看关注项： ${item.title}`, url: item.evidence_url };
   } else if (status.source?.evidence_url) {
-    nextInspection = { text: "Review source evidence", url: status.source.evidence_url };
+    nextInspection = { text: "查看来源证据", url: status.source.evidence_url };
   }
 
   return {

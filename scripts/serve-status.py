@@ -21,6 +21,9 @@ def main():
             if path == "/":
                 body = Path(__file__).with_name("workbench.html").read_bytes()
                 content_type = "text/html; charset=utf-8"
+            elif path == "/chinese.js":
+                body = Path(__file__).resolve().parents[1].joinpath("src/lib/chinese.js").read_bytes()
+                content_type = "text/javascript; charset=utf-8"
             elif path[1:] in FILES:
                 try:
                     body = (root / path[1:]).read_bytes()
