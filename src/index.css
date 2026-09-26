@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  /* mat-console palette: ink, paper, mint */
+  --color-ink: #142121;
+  --color-paper: #fbf9f8;
+  --color-mint: #83cebe;
+
+  /* Derivatives of the palette for functional use. */
+  --color-mint-ink: #1f5c4f; /* mint darkened for readable text/links on paper */
+  --color-mint-wash: #e4f2ee; /* mint lightened for panels */
+  --color-line: #e7e1dd; /* hairline rules on paper */
+  --color-ink-soft: #4d5a5a; /* secondary text on paper (still ~7:1 contrast) */
+  --color-warn: #8a5a12; /* stale / attention accents */
+  --color-warn-wash: #f6ead6;
+  --color-danger: #9a3b3b; /* failed runs, blocked items */
+  --color-danger-wash: #f6e6e4;
+
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman",
+    serif;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    sans-serif;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+}
+
+/* Visible, consistent keyboard focus everywhere. */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-mint-ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
