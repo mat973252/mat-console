@@ -72,7 +72,7 @@ export function demoStatus(): unknown {
     },
     health: {
       state: "attention",
-      summary: "Moving toward resumable execution; two blocked items and one failed run need review.",
+      summary: "Moving toward resumable execution; one blocked item and one failed run need review.",
     },
     milestones: [
       {

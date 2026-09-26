@@ -12,7 +12,7 @@
   },
   "health": {
     "state": "attention",
-    "summary": "Two blocked items and one failed run need review."
+    "summary": "One blocked item and one failed run need review."
   },
   "progress": {
     "percent": 62,
