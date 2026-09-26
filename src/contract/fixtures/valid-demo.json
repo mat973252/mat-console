@@ -8,8 +8,7 @@
     "summary": "Durable workflow runtime prototype."
   },
   "source": {
-    "label": "mock adapter",
-    "evidence_url": "https://github.com/mat973252/mat-console/blob/main/docs/protocol-v1.md"
+    "label": "mock adapter"
   },
   "health": {
     "state": "attention",
@@ -23,15 +22,17 @@
     {
       "id": "m1",
       "title": "Runtime Core",
-      "state": "done",
-      "evidence_url": "https://github.com/mat973252/mat-console"
+      "state": "done"
     },
     {
       "id": "m3",
       "title": "Durable Execution",
       "state": "current",
       "description": "Read-only checks for unknown results.",
-      "evidence_count": { "recorded": 6, "expected": 9 }
+      "evidence_count": {
+        "recorded": 6,
+        "expected": 9
+      }
     },
     {
       "id": "m4",
@@ -45,16 +46,14 @@
       "label": "#140",
       "status": "failed",
       "started_at": "2026-09-25T11:00:00Z",
-      "finished_at": "2026-09-25T11:12:00Z",
-      "evidence_url": "https://github.com/mat973252/mat-console"
+      "finished_at": "2026-09-25T11:12:00Z"
     }
   ],
   "attention": [
     {
       "id": "a1",
       "title": "Timeout boundary unverified",
-      "severity": "blocked",
-      "evidence_url": "https://github.com/mat973252/mat-console"
+      "severity": "blocked"
     },
     {
       "id": "a2",

@@ -81,7 +81,7 @@ export const NarrowOverflow: Story = {
             id: "m1",
             title: "A milestone title that is far longer than any reasonable viewport width allows",
             state: "current",
-            evidence_url: "https://github.com/mat973252/mat-console",
+            evidence_url: "https://demo.invalid/evidence",
           },
         ],
         runs: [
@@ -89,7 +89,7 @@ export const NarrowOverflow: Story = {
             id: "run-with-a-very-long-identifier-abcdef0123456789",
             label: "ci/nightly-build-deploy-verify-2026-09-25-extra-long-label",
             status: "failed",
-            evidence_url: "https://github.com/mat973252/mat-console",
+            evidence_url: "https://demo.invalid/evidence",
           },
         ],
         attention: [
@@ -99,7 +99,7 @@ export const NarrowOverflow: Story = {
               "A very long attention item title that must wrap across multiple lines at 320px " +
               "without pushing the evidence link off screen",
             severity: "blocked",
-            evidence_url: "https://github.com/mat973252/mat-console",
+            evidence_url: "https://demo.invalid/evidence",
           },
         ],
       },

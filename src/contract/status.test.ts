@@ -85,12 +85,23 @@ describe("validateProjectStatus", () => {
       "2026-09-25T14:20:00", // no timezone
       "2026-09-25", // date only
       "2026-02-30T00:00:00Z", // not a real date
+      "2026-02-29T00:00:00Z", // 2026 is not a leap year
       "25 Sep 2026 14:20 UTC",
+      "2026-09-25T14:20:60Z", // leap seconds not allowed
+      "2026-09-25T14:20:00+99:99", // impossible offset
+      "2026-09-25T14:20:00+24:00", // offset beyond ±14:00
+      "2026-09-25T14:20:00+14:01", // just past the real maximum
     ]) {
       const r = validateProjectStatus({ ...base, generated_at: ts });
       expect(r.ok, `expected ${ts} to be rejected`).toBe(false);
     }
-    for (const ts of ["2026-09-25T14:20:00Z", "2026-09-25T14:20:00+08:00"]) {
+    for (const ts of [
+      "2026-09-25T14:20:00Z",
+      "2026-09-25T14:20:00+08:00",
+      "2026-09-25T14:20:00+14:00", // max real offset
+      "2026-09-25T14:20:00-05:30",
+      "2028-02-29T00:00:00Z", // leap day in a leap year
+    ]) {
       const r = validateProjectStatus({ ...base, generated_at: ts });
       expect(r.ok, `expected ${ts} to be accepted`).toBe(true);
     }

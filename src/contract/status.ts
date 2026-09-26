@@ -121,17 +121,27 @@ const isRecord = (v: unknown): v is Record<string, unknown> =>
  * shape and every component are checked directly (rejects `2026-02-30T00:00:00Z`).
  */
 const ISO_TIMESTAMP =
-  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$/;
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d{1,9})?(Z|([+-])(\d{2}):(\d{2}))$/;
 
 const isIsoTimestamp = (v: unknown): v is string => {
   if (typeof v !== "string") return false;
   const m = ISO_TIMESTAMP.exec(v);
   if (!m) return false;
-  // Date.parse normalizes out-of-range fields (Feb 30 → Mar 2), so check the
-  // components directly rather than trusting it.
-  const [, y, mo, d, hh, mm, ss] = m.map(Number);
-  const maxDay = new Date(Date.UTC(y, mo, 0)).getUTCDate();
-  return mo >= 1 && mo <= 12 && d >= 1 && d <= maxDay && hh <= 23 && mm <= 59 && ss <= 60;
+  // Date.parse normalizes out-of-range fields (Feb 30 → Mar 2), so every
+  // component is checked directly. Seconds cap at 59 (no leap seconds) and
+  // timezone offsets at ±14:00 — a document that passes validation must also
+  // parse into a real instant for freshness checks.
+  const n = (i: number) => Number(m[i]);
+  const maxDay = new Date(Date.UTC(n(1), n(2), 0)).getUTCDate();
+  if (!(n(2) >= 1 && n(2) <= 12 && n(3) >= 1 && n(3) <= maxDay && n(4) <= 23 && n(5) <= 59 && n(6) <= 59)) {
+    return false;
+  }
+  if (m[8] !== "Z") {
+    const offH = n(10);
+    const offM = n(11);
+    if (offH > 14 || offM > 59 || (offH === 14 && offM > 0)) return false;
+  }
+  return Number.isFinite(Date.parse(v));
 };
 
 /** Finite numbers only — JSON has no NaN/Infinity, but JS objects passed
