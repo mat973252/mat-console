@@ -63,6 +63,11 @@ export function deriveOverview(status: ProjectStatus, now: Date): OverviewView {
       text: `Review current milestone: ${currentMilestone.title}`,
       url: currentMilestone.evidence_url,
     };
+  } else if (attention.some((a) => a.evidence_url)) {
+    const item = attention.find((a) => a.evidence_url)!;
+    nextInspection = { text: `Review item: ${item.title}`, url: item.evidence_url };
+  } else if (status.source?.evidence_url) {
+    nextInspection = { text: "Review source evidence", url: status.source.evidence_url };
   }
 
   return {
