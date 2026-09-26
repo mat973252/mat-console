@@ -62,6 +62,10 @@ without adopting React.
 
 ## Layout
 
+Three project producers are available: Agent Platform, Relay and AgentPermit4j.
+See [local integration guide](docs/project-integrations.md) for export commands,
+the loopback-only launcher and evidence limits.
+
 ```
 src/
   contract/    status.ts (types + runtime validator), fixtures/, tests
