@@ -69,7 +69,7 @@ export function demoStatus(): unknown {
     },
     source: {
       label: "mock adapter",
-      evidence_url: "https://example.com/relay/status",
+      evidence_url: "https://github.com/mat973252/mat-console/blob/main/docs/protocol-v1.md",
     },
     health: {
       state: "attention",
@@ -81,21 +81,21 @@ export function demoStatus(): unknown {
         title: "Runtime Core",
         state: "done",
         description: "Core execution and tool boundaries have acceptance records.",
-        evidence_url: "https://example.com/relay/m1",
+        evidence_url: "https://github.com/mat973252/mat-console",
       },
       {
         id: "m2",
         title: "State Persistence",
         state: "done",
         description: "Persistence paths recorded; failure recovery still being verified.",
-        evidence_url: "https://example.com/relay/m2",
+        evidence_url: "https://github.com/mat973252/mat-console",
       },
       {
         id: "m3",
         title: "Durable Execution",
         state: "current",
         description: "Read-only checks for unknown results and the link boundary.",
-        evidence_url: "https://example.com/relay/m3",
+        evidence_url: "https://github.com/mat973252/mat-console",
         evidence_count: { recorded: 6, expected: 9 },
       },
       {
@@ -111,7 +111,7 @@ export function demoStatus(): unknown {
         label: "#141",
         status: "running",
         started_at: hoursAgo(0.5),
-        evidence_url: "https://example.com/relay/runs/141",
+        evidence_url: "https://github.com/mat973252/mat-console",
       },
       {
         id: "run-140",
@@ -119,7 +119,7 @@ export function demoStatus(): unknown {
         status: "failed",
         started_at: hoursAgo(3),
         finished_at: hoursAgo(2.8),
-        evidence_url: "https://example.com/relay/runs/140",
+        evidence_url: "https://github.com/mat973252/mat-console",
       },
       {
         id: "run-139",
@@ -127,7 +127,7 @@ export function demoStatus(): unknown {
         status: "succeeded",
         started_at: hoursAgo(26),
         finished_at: hoursAgo(25.7),
-        evidence_url: "https://example.com/relay/runs/139",
+        evidence_url: "https://github.com/mat973252/mat-console",
       },
     ],
     attention: [
@@ -136,7 +136,7 @@ export function demoStatus(): unknown {
         title: "Timeout boundary for unknown results is unverified",
         severity: "blocked",
         detail: "Two acceptance checks depend on this boundary.",
-        evidence_url: "https://example.com/relay/attention/a1",
+        evidence_url: "https://github.com/mat973252/mat-console",
       },
       {
         id: "a2",

@@ -114,8 +114,30 @@ const SECRET_KEY_PATTERN = /(secret|token|passw(?:or)?d|credential|api[_-]?key|b
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === "object" && v !== null && !Array.isArray(v);
 
-const isIsoDate = (v: unknown): v is string =>
-  typeof v === "string" && !Number.isNaN(Date.parse(v));
+/**
+ * Unambiguous ISO-8601 timestamp with an explicit timezone — `Z` or a
+ * `±hh:mm` offset. `Date.parse` alone accepts local times, US-style dates and
+ * bare numbers and normalizes out-of-range fields (Feb 30 → Mar 2), so the
+ * shape and every component are checked directly (rejects `2026-02-30T00:00:00Z`).
+ */
+const ISO_TIMESTAMP =
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$/;
+
+const isIsoTimestamp = (v: unknown): v is string => {
+  if (typeof v !== "string") return false;
+  const m = ISO_TIMESTAMP.exec(v);
+  if (!m) return false;
+  // Date.parse normalizes out-of-range fields (Feb 30 → Mar 2), so check the
+  // components directly rather than trusting it.
+  const [, y, mo, d, hh, mm, ss] = m.map(Number);
+  const maxDay = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+  return mo >= 1 && mo <= 12 && d >= 1 && d <= maxDay && hh <= 23 && mm <= 59 && ss <= 60;
+};
+
+/** Finite numbers only — JSON has no NaN/Infinity, but JS objects passed
+ *  directly (fixtures, tests, hand-built payloads) can contain them. */
+const isFiniteNumber = (v: unknown): v is number =>
+  typeof v === "number" && Number.isFinite(v);
 
 const isUrl = (v: unknown): v is string => {
   if (typeof v !== "string") return false;
@@ -138,12 +160,15 @@ export function validateProjectStatus(input: unknown): ValidationResult {
   if (input.contract !== CONTRACT_ID) {
     err("contract", `must equal "${CONTRACT_ID}"`);
   }
-  if (!isIsoDate(input.generated_at)) {
-    err("generated_at", "required ISO-8601 timestamp of when the source produced this document");
+  if (!isIsoTimestamp(input.generated_at)) {
+    err(
+      "generated_at",
+      "required ISO-8601 timestamp with explicit timezone of when the source produced this document",
+    );
   }
   if (input.ttl_seconds !== undefined) {
-    if (typeof input.ttl_seconds !== "number" || input.ttl_seconds < 0) {
-      err("ttl_seconds", "must be a non-negative number of seconds");
+    if (!isFiniteNumber(input.ttl_seconds) || input.ttl_seconds < 0) {
+      err("ttl_seconds", "must be a finite, non-negative number of seconds");
     }
   }
 
@@ -196,8 +221,11 @@ export function validateProjectStatus(input: unknown): ValidationResult {
       err("progress", "must be an object");
     } else {
       const p = input.progress.percent;
-      if (typeof p !== "number" || p < 0 || p > 100) {
-        err("progress.percent", "must be a number between 0 and 100 (omit `progress` when unknown)");
+      if (!isFiniteNumber(p) || p < 0 || p > 100) {
+        err(
+          "progress.percent",
+          "must be a finite number between 0 and 100 (omit `progress` when unknown)",
+        );
       }
       if (input.progress.basis !== undefined && typeof input.progress.basis !== "string") {
         err("progress.basis", "must be a string");
@@ -228,13 +256,19 @@ export function validateProjectStatus(input: unknown): ValidationResult {
     if (m.evidence_url !== undefined && !isUrl(m.evidence_url)) {
       err(`${p}.evidence_url`, "must be an http(s) URL");
     }
-    if (m.updated_at !== undefined && !isIsoDate(m.updated_at)) {
-      err(`${p}.updated_at`, "must be an ISO-8601 timestamp");
+    if (m.updated_at !== undefined && !isIsoTimestamp(m.updated_at)) {
+      err(`${p}.updated_at`, "must be an ISO-8601 timestamp with explicit timezone");
     }
     if (m.evidence_count !== undefined) {
       const ec = m.evidence_count;
-      if (!isRecord(ec) || typeof ec.recorded !== "number" || typeof ec.expected !== "number") {
-        err(`${p}.evidence_count`, "must be { recorded: number, expected: number }");
+      if (
+        !isRecord(ec) ||
+        !isFiniteNumber(ec.recorded) ||
+        !isFiniteNumber(ec.expected) ||
+        ec.recorded < 0 ||
+        ec.expected < 0
+      ) {
+        err(`${p}.evidence_count`, "must be { recorded: number, expected: number } with finite non-negative values");
       }
     }
   });
@@ -248,7 +282,9 @@ export function validateProjectStatus(input: unknown): ValidationResult {
       err(`${p}.status`, `must be one of ${RUN_STATUSES.join(", ")}`);
     }
     for (const k of ["started_at", "finished_at"] as const) {
-      if (r[k] !== undefined && !isIsoDate(r[k])) err(`${p}.${k}`, "must be an ISO-8601 timestamp");
+      if (r[k] !== undefined && !isIsoTimestamp(r[k])) {
+        err(`${p}.${k}`, "must be an ISO-8601 timestamp with explicit timezone");
+      }
     }
     if (r.evidence_url !== undefined && !isUrl(r.evidence_url)) {
       err(`${p}.evidence_url`, "must be an http(s) URL");
@@ -299,7 +335,7 @@ export function freshnessOf(status: ProjectStatus, now: Date): {
   ageSeconds: number;
 } {
   const generated = Date.parse(status.generated_at);
-  if (Number.isNaN(generated)) return { freshness: "unknown", ageSeconds: 0 };
+  if (!Number.isFinite(generated)) return { freshness: "unknown", ageSeconds: 0 };
   const ageSeconds = Math.max(0, Math.floor((now.getTime() - generated) / 1000));
   if (status.ttl_seconds === undefined) return { freshness: "unknown", ageSeconds };
   return { freshness: ageSeconds > status.ttl_seconds ? "stale" : "fresh", ageSeconds };

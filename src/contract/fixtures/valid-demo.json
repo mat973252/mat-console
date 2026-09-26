@@ -9,7 +9,7 @@
   },
   "source": {
     "label": "mock adapter",
-    "evidence_url": "https://example.com/relay/status"
+    "evidence_url": "https://github.com/mat973252/mat-console/blob/main/docs/protocol-v1.md"
   },
   "health": {
     "state": "attention",
@@ -24,7 +24,7 @@
       "id": "m1",
       "title": "Runtime Core",
       "state": "done",
-      "evidence_url": "https://example.com/relay/m1"
+      "evidence_url": "https://github.com/mat973252/mat-console"
     },
     {
       "id": "m3",
@@ -46,7 +46,7 @@
       "status": "failed",
       "started_at": "2026-09-25T11:00:00Z",
       "finished_at": "2026-09-25T11:12:00Z",
-      "evidence_url": "https://example.com/relay/runs/140"
+      "evidence_url": "https://github.com/mat973252/mat-console"
     }
   ],
   "attention": [
@@ -54,7 +54,7 @@
       "id": "a1",
       "title": "Timeout boundary unverified",
       "severity": "blocked",
-      "evidence_url": "https://example.com/relay/attention/a1"
+      "evidence_url": "https://github.com/mat973252/mat-console"
     },
     {
       "id": "a2",

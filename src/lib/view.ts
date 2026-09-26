@@ -33,7 +33,17 @@ export function deriveOverview(status: ProjectStatus, now: Date): OverviewView {
 
   const currentIdx = milestones.findIndex((m) => m.state === "current");
   const currentMilestone = currentIdx >= 0 ? milestones[currentIdx] : undefined;
-  const lastFailedRun = runs.find((r) => r.status === "failed");
+
+  // Most recent failed run: ordered by finished_at, then started_at. When no
+  // failed run carries a timestamp, fall back to document order (first match).
+  const failedRuns = runs.filter((r) => r.status === "failed");
+  const runTime = (r: ProjectRun) =>
+    Date.parse(r.finished_at ?? "") || Date.parse(r.started_at ?? "") || Number.NEGATIVE_INFINITY;
+  const timedFailed = failedRuns.filter((r) => Number.isFinite(runTime(r)));
+  const lastFailedRun =
+    timedFailed.length > 0
+      ? timedFailed.reduce((a, b) => (runTime(b) > runTime(a) ? b : a))
+      : failedRuns[0];
   const blockedCount = attention.filter((a) => a.severity === "blocked").length;
 
   const evidenceRecorded = currentMilestone?.evidence_count?.recorded;

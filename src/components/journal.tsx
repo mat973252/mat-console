@@ -147,17 +147,24 @@ function Snapshot({ view }: { view: OverviewView }) {
         </h2>
         <dl className="mt-3">
           <SnapshotRow label="Reported health">
-            <span
-              className={
-                view.healthState === "ok"
-                  ? "text-mint-ink"
-                  : view.healthState === "unknown"
-                    ? "text-ink-soft"
-                    : "text-warn"
-              }
-            >
-              {HEALTH_LABEL[view.healthState]}
-            </span>
+            {view.freshness === "stale" ? (
+              // A stale report is an old claim — never styled as live health.
+              <span className="text-warn">
+                {HEALTH_LABEL[view.healthState]} · stale report
+              </span>
+            ) : (
+              <span
+                className={
+                  view.healthState === "ok"
+                    ? "text-mint-ink"
+                    : view.healthState === "unknown"
+                      ? "text-ink-soft"
+                      : "text-warn"
+                }
+              >
+                {HEALTH_LABEL[view.healthState]}
+              </span>
+            )}
           </SnapshotRow>
           <SnapshotRow label="Current milestone">
             {view.currentMilestone
@@ -233,9 +240,9 @@ export function AttentionList({ view }: { view: OverviewView }) {
       </h2>
       <ul className="mt-4 divide-y divide-line border-y border-line">
         {view.attention.map((a) => (
-          <li key={a.id} className="flex items-baseline justify-between gap-4 py-3">
-            <div>
-              <p className="text-sm font-medium">
+          <li key={a.id} className="flex flex-wrap items-baseline justify-between gap-x-4 py-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium break-words">
                 <span
                   className={`mr-2 inline-block rounded px-1.5 py-0.5 text-xs font-semibold ${
                     a.severity === "blocked"
@@ -277,9 +284,9 @@ export function RunsList({ view }: { view: OverviewView }) {
       </h2>
       <ul className="mt-4 divide-y divide-line border-y border-line">
         {view.runs.map((r) => (
-          <li key={r.id} className="flex items-baseline justify-between gap-4 py-3">
-            <div className="flex items-baseline gap-3">
-              <span className="font-mono text-sm font-semibold">{r.label ?? r.id}</span>
+          <li key={r.id} className="flex flex-wrap items-baseline justify-between gap-x-4 py-3">
+            <div className="flex min-w-0 items-baseline gap-3">
+              <span className="break-all font-mono text-sm font-semibold">{r.label ?? r.id}</span>
               <span
                 className={`text-xs font-semibold ${
                   r.status === "failed"
@@ -312,21 +319,35 @@ export function RunsList({ view }: { view: OverviewView }) {
   );
 }
 
-export function JournalBody({ view, fetchedAt }: { view: OverviewView; fetchedAt: Date }) {
+export function JournalBody({
+  view,
+  fetchedAt,
+  adapter,
+}: {
+  view: OverviewView;
+  fetchedAt: Date;
+  adapter: StatusAdapter;
+}) {
   const { status } = view;
-  const summary =
-    view.healthSummary ??
-    status.project.summary ??
-    "No current-state summary was reported.";
+  // Concept C hierarchy: the reported current-state sentence is the headline;
+  // the project name stays in the eyebrow. Falls back to the project summary,
+  // then to the project name itself.
+  const headline = view.healthSummary ?? status.project.summary ?? status.project.name;
+  const supporting =
+    view.healthSummary !== undefined && status.project.summary
+      ? status.project.summary
+      : undefined;
   return (
     <main className="mx-auto w-full max-w-6xl px-5 pb-16 sm:px-10">
       <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-mint-ink">
-        {status.project.id} · current state
+        {status.project.name}
+        {status.project.id !== status.project.name.toLowerCase() && ` (${status.project.id})`}
+        {" · current state"}
       </p>
       <h1 className="mt-3 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-        {status.project.name}
+        {headline}
       </h1>
-      <p className="mt-4 max-w-2xl text-lg text-ink-soft">{summary}</p>
+      {supporting && <p className="mt-4 max-w-2xl text-lg text-ink-soft">{supporting}</p>}
 
       <div className="mt-10 grid gap-12 border-t border-line pt-10 lg:grid-cols-[1fr_340px]">
         <div>
@@ -339,7 +360,27 @@ export function JournalBody({ view, fetchedAt }: { view: OverviewView; fetchedAt
 
       <footer className="mt-12 space-y-1 text-xs text-ink-soft">
         <p>
-          Source: {status.source?.label ?? "unspecified"}
+          Source: {adapter.label}
+          {adapter.sourceUrl && (
+            <>
+              {" · "}
+              {/^https?:\/\//i.test(adapter.sourceUrl) ? (
+                <a
+                  href={adapter.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-mint-ink underline underline-offset-2"
+                >
+                  {adapter.sourceUrl}
+                </a>
+              ) : (
+                <span>{adapter.sourceUrl}</span>
+              )}
+            </>
+          )}
+          {status.source?.label && status.source.label !== adapter.label
+            ? ` · reported by ${status.source.label}`
+            : null}
           {status.source?.evidence_url && (
             <>
               {" · "}
@@ -349,7 +390,7 @@ export function JournalBody({ view, fetchedAt }: { view: OverviewView; fetchedAt
                 rel="noreferrer"
                 className="text-mint-ink underline underline-offset-2"
               >
-                status document
+                status evidence
               </a>
             </>
           )}

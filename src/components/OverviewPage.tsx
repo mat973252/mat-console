@@ -77,7 +77,7 @@ export function OverviewPage({ adapter }: { adapter: StatusAdapter }) {
             generatedAt={state.view.status.generated_at}
           />
         ) : (
-          <JournalBody view={state.view} fetchedAt={state.fetchedAt} />
+          <JournalBody view={state.view} fetchedAt={state.fetchedAt} adapter={adapter} />
         ))}
     </div>
   );

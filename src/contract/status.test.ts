@@ -74,6 +74,48 @@ describe("validateProjectStatus", () => {
     expect(badProgress.ok).toBe(false);
   });
 
+  it("rejects ambiguous or invalid timestamps", () => {
+    const base = {
+      contract: "mat-console.status/1",
+      project: { id: "a", name: "A" },
+    };
+    for (const ts of [
+      "1",
+      "01/02/2026",
+      "2026-09-25T14:20:00", // no timezone
+      "2026-09-25", // date only
+      "2026-02-30T00:00:00Z", // not a real date
+      "25 Sep 2026 14:20 UTC",
+    ]) {
+      const r = validateProjectStatus({ ...base, generated_at: ts });
+      expect(r.ok, `expected ${ts} to be rejected`).toBe(false);
+    }
+    for (const ts of ["2026-09-25T14:20:00Z", "2026-09-25T14:20:00+08:00"]) {
+      const r = validateProjectStatus({ ...base, generated_at: ts });
+      expect(r.ok, `expected ${ts} to be accepted`).toBe(true);
+    }
+  });
+
+  it("rejects NaN and infinities in numeric fields", () => {
+    const base = {
+      contract: "mat-console.status/1",
+      generated_at: "2026-09-25T14:20:00Z",
+      project: { id: "a", name: "A" },
+    };
+    for (const n of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(validateProjectStatus({ ...base, ttl_seconds: n }).ok).toBe(false);
+      expect(validateProjectStatus({ ...base, progress: { percent: n } }).ok).toBe(false);
+      expect(
+        validateProjectStatus({
+          ...base,
+          milestones: [
+            { id: "m", title: "M", state: "current", evidence_count: { recorded: n, expected: 3 } },
+          ],
+        }).ok,
+      ).toBe(false);
+    }
+  });
+
   it("rejects non-http evidence URLs", () => {
     const r = validateProjectStatus({
       contract: "mat-console.status/1",

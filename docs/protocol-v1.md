@@ -24,15 +24,17 @@ The canonical machine-checkable reference is the validator in
   keys that look like credentials (`token`, `secret`, `password`, `api_key`,
   …) anywhere in the payload.
 - **Forward compatibility.** Unknown top-level or nested keys are ignored so
-  producers can add fields without a version bump. The version changes when
-  meaning changes.
+  producers can add fields without a version bump — except that every key is
+  still checked by the no-secrets scan. The version changes when meaning
+  changes.
 
 ## Document shape
 
 ```jsonc
 {
   "contract": "mat-console.status/1",   // required, exact
-  "generated_at": "2026-09-25T14:20:00Z", // required ISO-8601: when the source produced this
+  "generated_at": "2026-09-25T14:20:00Z", // required ISO-8601 *with explicit timezone*
+                                          // (Z or ±hh:mm); local times and bare dates rejected
   "ttl_seconds": 3600,                   // optional freshness budget; past it → "stale"
   "project": {                           // required
     "id": "relay",                       // required non-empty
@@ -85,7 +87,19 @@ The canonical machine-checkable reference is the validator in
 ```
 
 Only `contract`, `generated_at`, and `project.{id,name}` are required; a valid
-minimal document is five lines. All `*_url` fields must be `http:`/`https:`.
+minimal document is five lines.
+
+Timestamps (`generated_at`, `updated_at`, `started_at`, `finished_at`) must be
+unambiguous ISO-8601 with an explicit timezone — `2026-09-25T14:20:00Z` or
+`+08:00` offsets are valid; `"2026-09-25T14:20:00"`, `"01/02/2026"`, and
+nonexistent dates like `2026-02-30` are rejected.
+
+The URL fields the contract defines — `source.url`, `source.evidence_url`,
+`milestones[].evidence_url`, `runs[].evidence_url`,
+`attention[].evidence_url` — must be `http:`/`https:`. Validation covers the
+known fields only: unknown extension fields are ignored (not type- or
+URL-checked), except that every key in the document — including extension
+fields — is still subject to the no-secrets scan.
 
 ## Serving it over HTTP
 

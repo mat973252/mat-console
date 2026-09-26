@@ -61,6 +61,54 @@ export const Loading: Story = {
   args: { adapter: pendingAdapter },
 };
 
+/** Long titles, labels, and evidence links at a narrow width — checks that
+ *  attention/run rows wrap instead of overflowing horizontally. */
+export const NarrowOverflow: Story = {
+  args: {
+    adapter: staticAdapter(
+      {
+        contract: "mat-console.status/1",
+        generated_at: new Date().toISOString(),
+        ttl_seconds: 3600,
+        project: { id: "verbose", name: "Verbose Project" },
+        health: {
+          state: "attention",
+          summary: "An extremely long reported current-state sentence that should still wrap " +
+            "cleanly inside the serif headline on narrow screens without overflowing.",
+        },
+        milestones: [
+          {
+            id: "m1",
+            title: "A milestone title that is far longer than any reasonable viewport width allows",
+            state: "current",
+            evidence_url: "https://github.com/mat973252/mat-console",
+          },
+        ],
+        runs: [
+          {
+            id: "run-with-a-very-long-identifier-abcdef0123456789",
+            label: "ci/nightly-build-deploy-verify-2026-09-25-extra-long-label",
+            status: "failed",
+            evidence_url: "https://github.com/mat973252/mat-console",
+          },
+        ],
+        attention: [
+          {
+            id: "a1",
+            title:
+              "A very long attention item title that must wrap across multiple lines at 320px " +
+              "without pushing the evidence link off screen",
+            severity: "blocked",
+            evidence_url: "https://github.com/mat973252/mat-console",
+          },
+        ],
+      },
+      "static fixture",
+    ),
+  },
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+};
+
 /** Health not reported at all — distinct from "ok" and from stale. */
 export const HealthUnknown: Story = {
   args: {
